@@ -1,0 +1,21 @@
+
+  # let p = startProcess("dmenu", options={poEchoCmd, poUsePath})
+  # var f: File = nil
+  # let success = open(f, inputHandle(p), mode=fmWrite)
+  # if success:
+  #   write(f, "one\ntwo")
+  #   sleep(1000)
+  # var exitCode = -1
+  # while exitCode == -1:
+    # exitCode = peekExitCode(p)
+  # var a = ""
+  # while(running(p)):
+  #   a = ""
+  # might cause  deadlock since no poParentStreams
+  # let code = waitForExit(p)
+  # let str = readAll(f)
+  # echo str
+  # else:
+  #   echo "Failed to write. Exiting."
+  #   quit QuitFailure
+  # var code = waitForExit(p)
