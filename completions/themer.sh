@@ -38,7 +38,7 @@ _themer() {
 	if [[ "$i" -eq "$COMP_CWORD" ]]; then
 		local cur="${COMP_WORDS[COMP_CWORD]}"
 		# shellcheck disable=SC2207
-		COMPREPLY=($(compgen -W "--program --theme --help --version" -- "$cur"))
+		COMPREPLY=($(compgen -W "--program --theme --tty --help --version" -- "$cur"))
 		return
 	fi
 
