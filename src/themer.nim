@@ -1,19 +1,28 @@
 #!/usr/bin/env -S nim r
 import os
-import osproc
-import strutils
 import terminal
-import rdstdin
 import parseopt
+import system
+import terminal
+# import exitprocs
+import "./util"
 import "./update"
 
-const VERSION {.strdefine.} = "unknown"
+system.addQuitProc(resetAttributes)
+# addExitProc(resetAttributes)
 
-proc writeHelp() =
-  echo "--theme, --program"
-
-proc writeVersion() =
-  echo VERSION
+const themes = [
+  "nord",
+  "dracula"
+]
+const programs = [
+  "xterm",
+  "alacritty",
+  "kitty",
+  "i3",
+  "rofi",
+  "dircolors"
+]
 
 proc doProgram(programName: string, theme: string) =
   case programName:
@@ -31,30 +40,24 @@ proc doProgram(programName: string, theme: string) =
     updateRofi(theme)
   of "dircolors":
     updateDircolors(theme)
-
-proc readTheme(): string =
-  var theme = ""
-  if isatty(stdin):
-    theme = readLineFromStdin("New theme?: ")
   else:
-    theme = readAll(stdin)
-  theme = theme.strip()
-  if theme == "":
-    echo "Theme not valid"
-    quit(QuitFailure)
-
-proc readThemeGraphical(): string =
-  let tup = execCmdEx("dmenu", options={poEchoCmd, poUsePath}, input = "nord\ndracula")
-  echo tup
-  if tup.exitCode != 0:
-    echo "Exit code not 0. Exiting"
+    warn "No matching program found. Exiting"
     quit QuitFailure
 
-  return tup.output.strip()
+proc doAll(theme: string) =
+  updateXResources(theme) # broken
+  updateAlacritty(theme)
+  updateTermite(theme)
+  updateKitty(theme)
+  # updateVscode(theme) # broken
+  updatei3(theme)
+  updateRofi(theme)
+  updateDircolors(theme)
+
 
 var program = ""
 var theme = ""
-var graphical = false
+var tty = false
 
 var p = initOptParser(commandLineParams())
 while true:
@@ -62,38 +65,38 @@ while true:
   case p.kind:
   of cmdEnd: break
   of cmdShortOption, cmdLongOption:
-    case p.key
+    case p.key:
       of "help", "h": writeHelp(); quit QuitSuccess
       of "version", "v": writeVersion(); quit QuitSuccess
       of "program":
         program = p.val
       of "theme":
         theme = p.val
-      of "graphical":
-        graphical = true
+      of "tty":
+        tty = true
   of cmdArgument:
-    echo "Argument: ", p.key
-
-if not graphical:
-  if theme == "":
-    theme = readTheme()
-else:
-  if theme == "":
-    theme = readThemeGraphical()
-
-if program != "":
-  doProgram(program, theme)
-  quit QuitSuccess
+    discard
+  #   echo "Argument: ", p.key
 
 if theme == "":
-  echo "Theme should not be blank"
+  if tty:
+    theme = promptTty(@themes)
+  else:
+    theme = promptGraphical(@themes)
+
+
+if theme == "":
+  error "Theme should not be blank. Exiting"
   quit QuitFailure
 
-updateXResources(theme) # broken
-updateAlacritty(theme)
-updateTermite(theme)
-updateKitty(theme)
-# updateVscode(theme) # broken
-updatei3(theme)
-updateRofi(theme)
-updateDircolors(theme)
+if program == "":
+  doAll(theme)
+elif program == "choose":
+  if tty:
+    program = promptTty(@programs)
+  else:
+    program = promptGraphical(@programs)
+else:
+  doProgram(program, theme)
+
+quit QuitSuccess

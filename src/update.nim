@@ -4,7 +4,6 @@ import strformat
 import strutils
 import "./util"
 
-
 proc updateXResources*(themeName: string) =
   echo "UPDATING XRESOURCES"
   let cfgDir = getCfg()
