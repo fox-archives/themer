@@ -4,12 +4,12 @@ Nim scripts used to dynamically change application themes. For example, you can 
 
 Some applications have direct support for live reload/refresh (alacritty, kitty, i3). Others have other methods of dynamid updating like xterm, etc
 
-At the moment, correct behavior depends heavily on user setup (with my dotfiles). More specifically, it expects to see ~/.config/$program/themes/$theme.theme.conf
+At the moment, correct behavior depends heavily on user setup (with my dotfiles). More specifically, it expects to see `~/.config/$program/themes/$theme.theme.conf`
 
 ## Usage
 
 ```sh
-git clone https://github.com/eankeen/themer
+git clone https://github.com/hyperupcall/themer
 cd themer
 nimble install
 ```
